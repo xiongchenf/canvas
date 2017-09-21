@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; background: #333;margin: 0 auto;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		var ctx = this.canvas.getContext('2d');
+		var y = 0, 
+			x = 0,
+			stars = [],
+			r = 20,
+			w = window.innerWidth,
+			h = window.innerHeight;
+			canvas.width = w * 2;
+			canvas.height = h * 2;
+			canvas.style.width = w +'px';
+			canvas.style.height = h +'px';
+		function random(min, max) {
+			return Math.floor(Math.random() * (max-min) + min);
+		}
+
+		function createStar() {
+			var star = {};
+				star['sx'] =  random(100, w * 2 - 200);
+				star['sy'] =  random(10, 300);
+				star['ey'] =  random(h * 2 - 100, h * 2 - 200);
+				star['rd'] = random(80, 120);
+				star['speed'] = random(6, 10);
+				stars.push(star);
+				return star;
+		}
+
+		function resetStar(i) {
+			stars[i]['sx'] =  random(100, w * 2 - 200);
+			stars[i]['sy'] =  random(10, 300);
+			stars[i]['ey'] =  random(h * 2 - 100, h * 2 - 200);
+			stars[i]['rd'] = random(80, 120);
+			stars[i]['speed'] = random(6, 10);
+		}
+
+		function drawStar() {
+			for(var i = 0, l = 20; i < l; i++) {
+				var star = createStar();
+				ctx.beginPath();
+				ctx.fillRect(star['sx'], star['sy'], 4, 8);
+			}
+		}
+
+		function drawRipple(o) {
+			var x = o.sx,
+				y = o.ey,
+				r = o.rd,
+				hr = r/2;
+			ctx.moveTo(x - r, y);
+			ctx.bezierCurveTo(x - r, y + hr, x + r, y + hr, x + r, y);
+			ctx.bezierCurveTo(x + r, y - hr, x - r, y - hr, x - r, y);
+			ctx.strokeStyle = '#00fcfc';
+			ctx.stroke();
+		}
+
+		drawStar();
+
+		function drawArc() {
+			for(var i = 0, l = stars.length; i < l; i++) {
+				ctx.beginPath();
+				ctx.fillStyle = '#00fcfc';
+				var sx = stars[i]['sx'];
+				var sy = stars[i]['sy'];
+				var ey = stars[i]['ey'];
+				stars[i]['sy'] += stars[i]['speed'];
+				// 如果移动到结束点触发。
+				if(stars[i]['sy'] >= stars[i]['ey']) {
+					stars[i]['rd'] += 1.6;
+					// 如果水滴随机半径大于60触发。
+					if(stars[i]['rd'] >= 180) {
+						// 重置水滴参数
+						resetStar(i);
+					} else {
+						// 绘制此水滴波纹
+						drawRipple(stars[i]);
+					}
+				} else {
+					ctx.fillRect(stars[i]['sx'], stars[i]['sy'], 4, 8);
+					ctx.fill();
+				}
+			}
+		}
+
+		function draw() {
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			drawArc();
+			window.requestAnimationFrame(draw);
+		}
+		draw();
+	</script>
+</body>
+</html>

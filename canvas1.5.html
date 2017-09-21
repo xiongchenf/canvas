@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; margin: 0 auto; width: 600px; height: 600px;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="1200" height="1200"></canvas>
+	<!--script type="text/javascript" src="animation.js"></script -->
+	<script type="text/javascript">
+		var	C = function() {
+			this.canvas = document.getElementById('canvas');
+			this.ctx = this.canvas.getContext('2d');
+			this.arcX = 30;
+			this.arcY = 1000;
+			this.arcR = 20;
+			this.request;
+		};
+
+		C.prototype.draw = function(x, y) {
+			this.ctx.arc(x, y, this.arcR, 0, 2*Math.PI);
+			this.ctx.filleStyle = 'rgba(0, 0, 0, 0.6)';
+			this.ctx.fill();
+		};
+
+		C.prototype.cEvent = function() {
+			var self = this;
+			this.canvas.onclick = function(evt) {
+				var e = evt || window.event;
+				var posX = e.offsetX;
+				var posY = e.offsetY;
+				self.draw(posX*2, posY*2);
+				self.endX = posX*2;
+				self.endY = posY*2;
+				//isPointInPath
+				// if(self.isInArc(posX, posY)) {
+				// 	self.bezier(posX);
+				// }
+				self.ctx.moveTo(this.arcX, this.arcY);
+				self.getPostion(posX*2, posY*2);
+			}
+		};
+
+		C.prototype.getPostion = function(x,y) {
+			var x1 = this.arcX;
+			var y1 = this.arcY;
+			var cx = (x - x1)/2;
+			var cy = y < y1? y - 100 : y1 - 100;
+			this.pointer = {
+				'zero': [cx, cy],
+				'p1': [x1, y1],
+				'p2': [x, y]
+			};
+			this.coord(this.pointer);
+		};
+
+		C.prototype.coord = function(pointer) {
+			//  res coord to (0, 0)
+			// x1 = pointer['x1']['0'] - ponter['zero']['0'] 
+			// y1 = pointer['x1']['1'] - ponter['zero']['1'] 
+			var x1 = pointer['p1']['0'] - pointer['zero']['0'],
+				y1 = pointer['p1']['1'] - pointer['zero']['1'], 
+				x2 = pointer['p2']['0'] - pointer['zero']['0'], 
+				y2 = pointer['p2']['1'] - pointer['zero']['1']; 
+			// a * x1 * x1 + b * x1  = y1;
+			// b = (y1 - a * x1 * x1)/x1;
+			// a * x2 * x2 + b * x2  = y2;
+			// a * x2 * x2 + ((y1 - a * x1 * x1) * x2)/x1 = y2;
+			// a * x2 * x2 * x1 + (y1 - a * x1 * x1) * x2 = y2 * x1;
+			// a * x2 * x2 * x1 + y1 * x2 - a * x1 *x1 * x2  = y2 * x1;
+			// a(x2 * x2 * x1 - x1 * x1 *x2) = y2 * x1 - y1* x2;
+			a = (y2 * x1 - y1* x2)/(x2 * x2 * x1 - x1 * x1 *x2);
+			b = (y1 - a * x1 * x1)/x1;
+			this.a = a;
+			this.b = b;
+			this.animate();
+		};
+
+
+		C.prototype.polyen = function(x) {
+			return this.a * x * x + this.b * x;
+		};
+
+		C.prototype.animate = function() {
+			c.arcX += 8;
+			x = c.arcX + c.pointer['zero']['0'];
+			y = c.polyen(c.arcX - c.pointer['zero']['0']) + c.pointer['zero']['1'];
+			c.drawArc(c.arcX, y);
+			if(c.arcX >= c.endX) {
+				window.cancelAnimationFrame(request);
+			}
+			this.request = window.requestAnimationFrame(c.animate);
+		};
+
+
+		C.prototype.drawArc = function(x, y) {
+			this.ctx.filleStyle = 'rgba(0, 0, 0, 0.03)';
+			this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+			this.ctx.fillStyle = 'white';
+			this.ctx.arc(x, y, this.arcR, 0, 2*Math.PI);
+			this.ctx.fill();
+		};
+
+		C.prototype.isInArc =  function(px, py) {
+			var dist = Math.sqrt((px-this.arcX/2)*(px-this.arcX/2) + (py-this.arcY/2)*(py-this.arcY/2));
+			return dist <= this.arcR/2 ? true : false;
+		};
+
+		C.prototype.bezier = function(posX) {
+			var pointerY = Math.random() * 200;
+			var endX = Math.random() * 200 + 900;
+			var endY = Math.random() * 200 + 900;
+			var pointerX = parseInt((endY - posX)/2);
+			this.ctx.moveTo(this.arcX, this.arcY);
+			this.ctx.quadraticCurveTo(pointerX, pointerY, endX, endY);
+			this.ctx.stroke();
+		};
+		var c = new C();
+		c.cEvent();
+		c.draw(c.arcX, c.arcY);
+
+	</script>
+</body>
+</html>

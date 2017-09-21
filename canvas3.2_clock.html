@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; margin: 0 auto; width: 600px; height: 600px;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="1200" height="1200"></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas'), 
+  		    ctx = canvas.getContext('2d'),
+  			radius = 160,
+  			w = canvas.width,
+  			h = canvas.height,
+  			t = new Date();
+
+  		function drawClock() {
+  			ctx.arc(w/2, h/2, 300, 0, 2 * Math.PI, false);
+  			ctx.strokeStyle = '#5e3d23';
+  			ctx.fillStyle = '#f5efdc';
+  			ctx.lineWidth = 2;
+  			ctx.stroke();
+  			ctx.fill();
+  			ctx.beginPath();
+  			ctx.arc(w/2, h/2, 30, 0 ,2 * Math.PI, false);
+  			ctx.fillStyle = '#5e3d23';
+  			ctx.fill();
+  		}
+
+  		drawClock();
+
+  		function drawHand() {
+  			// ctx.fillStyle = '#5e3d23';
+  			// ctx.fillRect(w/2, h/2, 20, 100);
+  			// 时针
+  			ctx.strokeStyle = '#5e3d23';
+  			ctx.lineWidth = 20;
+  			ctx.beginPath();
+  			ctx.moveTo(w/2, h/2);
+  			ctx.lineTo(w/2+160, h/2);
+  			ctx.lineCap = 'round';
+  			ctx.stroke();
+  		}
+
+  		function hourHand() {
+  			var hour = t.getHours();
+  				hour  = hour > 12 ? hour - 12 : hour;
+  			var deg = 360 / 12 * hour - 90;
+  			
+  		}
+
+  		drawHand();
+	</script>
+</body>
+</html>

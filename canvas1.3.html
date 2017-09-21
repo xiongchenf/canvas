@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas {background: #e9e9e9; display: block; margin: 0 auto; width: 600px; height: 600px;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="1200" height="1200"></canvas>
+	<script type="text/javascript" src="animation.js"></script>
+	<script type="text/javascript">
+		var	C = function() {
+			this.canvas = document.getElementById('canvas');
+			this.ctx = this.canvas.getContext('2d');
+			this.arcX = 30;
+			this.arcY = 1000;
+			this.arcR = 20;
+		};
+
+		C.prototype.draw = function() {
+			this.ctx.arc(this.arcX, this.arcY, this.arcR, 0, 2*Math.PI);
+			this.ctx.filleStyle = 'rgba(0, 0, 0, 0.6)';
+			this.ctx.fill();
+		};
+
+		C.prototype.cEvent = function() {
+			var self = this;
+			this.canvas.onclick = function(evt) {
+				var e = evt || window.event;
+				var posX = e.offsetX;
+				var posY = e.offsetY;
+				//isPointInPath
+				if(self.ctx.isPointInPath) {
+					self.bezier(posX);
+				}
+			}
+
+		};
+
+		C.prototype.bezier = function(posX) {
+			var pointerY = Math.random() * 200;
+			var endX = Math.random() * 200 + 900;
+			var endY = Math.random() * 200 + 900;
+			var pointerX = parseInt((endY - posX)/2);
+			this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+			this.ctx.moveTo(this.arcX, this.arcY);
+			this.ctx.quadraticCurveTo(pointerX, pointerY, endX, endY);
+			this.ctx.stroke();
+		}
+
+		C.prototype.animate = function() {
+			this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+
+			window.requestNextAnimationFrame(this.animate);
+		};
+
+		var c = new C();
+		c.cEvent();
+		c.draw();
+
+
+
+		
+	</script>
+</body>
+</html>

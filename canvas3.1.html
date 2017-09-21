@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; background: #333;margin: 0 auto;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas"></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas'), 
+  		    ctx = canvas.getContext('2d'),
+  			radius = 30,
+  			w = window.innerWidth,
+  			h = window.innerHeight;
+  			canvas.width = w;
+  			canvas.height = h;
+  			var hfx = w/2;
+  			var hfy = h/2;
+		function draw(r) {
+			ctx.beginPath();
+			ctx.strokeStyle = "#fc0";
+			ctx.lineWidth = 0.5;
+			ctx.fillRect(0, 0, w, h);
+			ctx.strokeStyle = "#0cf";
+			ctx.moveTo(hfx - radius, hfy);
+			ctx.bezierCurveTo(hfx-radius, hfy + radius/2, hfx + radius, hfy + radius/2, hfx + radius, h/2);
+			ctx.bezierCurveTo(hfx+radius, hfy - radius/2, hfx - radius, hfy - radius/2, hfx - radius, hfy);
+			ctx.stroke();
+			ctx.closePath();
+		}
+
+		function ani() {
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.03)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			radius += 0.63;
+			if(radius >= 90) {
+				radius = 40;
+			}
+			draw(radius);
+			window.requestAnimationFrame(ani);
+		}
+
+		ani();
+
+	</script>
+</body>
+</html>

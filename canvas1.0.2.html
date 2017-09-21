@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; background: #333;margin: 0 auto; width: 600px; height: 600px;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="1200" height="1200"></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		var ctx = this.canvas.getContext('2d');
+		var y = 0, x = 0;
+		var stars = [];
+
+		function createStar() {
+			var star = {};
+				star['sx'] =  Math.random() * canvas.width;
+				star['sy'] =  Math.random() * 100 + 100;
+				star['ey'] =  Math.random() * 100 + 1000;
+				star['speed'] = Math.random() * 5 + 5;
+				stars.push(star);
+				return star;
+		}
+
+		function resetStar(i) {
+			stars[i]['sx'] =  100 + Math.random() * canvas.width - 200;
+			stars[i]['sy'] =  Math.random() * 100 + 100;
+			stars[i]['ey'] =  Math.random() * 100 + 1000;
+			stars[i]['speed'] = Math.random() * 5 + 5;
+		}
+
+		function drawStar() {
+			for(var i = 0, l = 8; i < l; i++) {
+				var star = createStar();
+				ctx.beginPath();
+				ctx.arc(star['sx'], star['sy'], 4, 0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+
+		drawStar();
+
+		function drawArc() {
+			for(var i = 0, l = stars.length; i < l; i++) {
+				ctx.beginPath();
+				var sx = stars[i]['sx'];
+				var sy = stars[i]['sy'];
+				var ey = stars[i]['ey'];
+				stars[i]['sy'] += stars[i]['speed'];
+				if(stars[i]['sy'] >= canvas.height) {
+					resetStar(i);
+				};
+				ctx.arc(sx, sy, 4, 0, Math.PI * 2, false);	
+				ctx.fillStyle = 'white';
+				ctx.fill();
+			}
+		}
+
+		function draw() {
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			drawArc();
+			window.requestAnimationFrame(draw);
+		}
+		draw();
+	</script>
+</body>
+</html>

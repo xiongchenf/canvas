@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas {background: #ddd; display: block; margin: 0 auto;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width="500" height="500"></canvas>
+	<script type="text/javascript" src="animation.js"></script>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		var mx = 10, my = 10;
+		var ix = 10, iy = 10;
+		var rx = 4;
+		var ry = 4;
+		function draw(x, y) {
+			var initialOpacity = 0,
+				radius = 10;
+			for(var i = 0, l = 33; i < l; i++) {
+
+				x += rx;
+				y += ry;
+
+				initialOpacity += 0.03;
+				radius += 0.406;
+				file(x, y, initialOpacity, radius);
+			}
+		}
+		function file(initialX,initialY, opacity, radius) {
+			ctx.beginPath();
+			ctx.fillStyle = 'rgba(222, 0, 0, '+ opacity +')';
+			ctx.arc(initialX, initialY, radius, 0, 2*Math.PI);
+			ctx.fill();
+		}
+		function animate() {
+			ctx.clearRect(0,0,canvas.width,canvas.height);
+			if(ix >= 368) {
+				mx = -10;
+				rx = -4;
+			} else if(ix <= 0) {
+				mx = 10;
+				rx = 4;
+			}
+			if(iy >= 368) {
+				my = -10;
+				ry = -4;
+			} else if(iy <= 0) {
+				my = 10;
+				ry = 4;
+			}
+
+			ix += mx;
+			iy += my;
+			draw(ix, iy);
+			window.requestNextAnimationFrame(animate);
+		}
+
+		animate();
+	</script>
+</body>
+</html>
