@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+	<title>Document</title>
+	<style tyle="text/css">
+		* {margin: 0; padding: 0}
+		body, html {height: 100%; background: #f9f9f9}
+		#canvas { display: block; background: #333;margin: 0 auto;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" width='1200' height='650'></canvas>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas'), 
+  		    ctx = canvas.getContext('2d'),
+  			radius = 30,
+  			w = window.innerWidth,
+  			h = window.innerHeight;
+  			hfx = w/2;
+  			hfy = h/2;
+  			img = './images/example.jpg',
+  			canvas.width = w;
+  			canvas.height = h;
+  			let photo = new Image();
+  				photo.onload = () => {
+  					ctx.drawImage(photo, 0, 0, 512, 650, 0, 0, 512, 650);
+  				}
+  			photo.src = img;
+
+  			let imgdata = ctx.getImageData(0,0,512,650);
+  			for(var i=0, len= imgdata.data.length; i<len; i+=4) {
+			    imgdata.data[i] = 255-imgdata.data[i];
+			    imgdata.data[i+1] = 255-imgdata.data[i+1];
+			    imgdata.data[i+2] = 255-imgdata.data[i+2];
+			}
+
+			console.log(imgdata)
+
+			ctx.clearRect(0,0,w,h);
+
+			ctx.putImageData(imgdata, 520, 0);
+	</script>
+</body>
+</html>
