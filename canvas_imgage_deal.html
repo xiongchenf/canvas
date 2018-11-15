@@ -1,46 +1,128 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-	<title>Document</title>
-	<style tyle="text/css">
-		* {margin: 0; padding: 0}
-		body, html {height: 100%; background: #f9f9f9}
-		#canvas { display: block; background: #333;margin: 0 auto;}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Document</title>
+    <style tyle="text/css">
+        * {
+            margin: 0;
+            padding: 0
+        }
+
+        body, html {
+            height: 100%;
+            background: #f9f9f9
+        }
+
+        #canvas {
+            display: block;
+            background: #333;
+            margin: 0 auto;
+        }
+    </style>
 </head>
 <body>
-	<canvas id="canvas" width='1200' height='650'></canvas>
-	<script type="text/javascript">
-		var canvas = document.getElementById('canvas'), 
-  		    ctx = canvas.getContext('2d'),
-  			radius = 30,
-  			w = window.innerWidth,
-  			h = window.innerHeight;
-  			hfx = w/2;
-  			hfy = h/2;
-  			img = './images/example.jpg',
-  			canvas.width = w;
-  			canvas.height = h;
-  			let photo = new Image();
-  				photo.onload = () => {
-  					ctx.drawImage(photo, 0, 0, 512, 650, 0, 0, 512, 650);
-  				}
-  			photo.src = img;
+<canvas id="canvas"></canvas>
+<script type="text/javascript">
+    var canvas = document.getElementById('canvas'),
+        ctx = canvas.getContext('2d'),
+        radius = 30,
+        w = window.innerWidth,
+        h = window.innerHeight;
+    hfx = w / 2;
+    hfy = h / 2;
+    img = './images/example.jpg',
+        canvas.width = w;
+    canvas.height = h;
+    let photo = new Image();
+    photo.onload = () => {
+        // ctx.fillRect(0, 0, 512, 650);
+        ctx.drawImage(photo, 0, 0);
+        let data = ctx.getImageData(0, 0, 512, 650);
+        let line = 1,
+            curLineMaxIndex = 512 * 4;
+        for (var i = 0, len = data.data.length; i < len; i += 4) {
+            // if (i % (512 * 4) === 0) {
+                line++;
+                // 当前行最大index
+                let curPoint = pointAvg(data.data, i);
+                data.data[i] = curPoint.r;
+                data.data[i+1] = curPoint.g;
+                data.data[i+2] = curPoint.b;
+                data.data[i+3] = curPoint.a;
+                curLineMaxIndex = 512 * 4 * line;
+            // }
+            // 反色
+            // data.data[i] = 255-data.data[i];
+            // data.data[i+1] = 255-data.data[i+1];
+            // data.data[i+2] = 255-data.data[i+2];
+            // data.data[i+3] = data.data[i+3];
+            // 调亮度
+            // data.data[i] -= 20;
+            // data.data[i+1] -= 30;
+            // data.data[i+2] -= 30;
+            // 灰度
+            // let avg = (data.data[i]+data.data[i+1]+data.data[i+2])/3;
+            // data.data[i] = avg;
+            // data.data[i+1] = avg;
+            // data.data[i+2] = avg;
+            // 与前2个像素点的均值对比和后2个像素点的均值对比
+            // if (i > 512 * 4 && i < 512*4) {
+            //   data.data[i] = 255;
+            //   data.data[i+1] = 255;
+            //   data.data[i+2] = 255;
+            // }
+            // 向前搜索
+        }
+        ctx.putImageData(data, 560, 0);
+    };
 
-  			let imgdata = ctx.getImageData(0,0,512,650);
-  			for(var i=0, len= imgdata.data.length; i<len; i+=4) {
-			    imgdata.data[i] = 255-imgdata.data[i];
-			    imgdata.data[i+1] = 255-imgdata.data[i+1];
-			    imgdata.data[i+2] = 255-imgdata.data[i+2];
-			}
+    function pointAvg(data, i) {
+        let arr = [], points = {};
+        for (let a = 0; a < 4; a++) {
+            let pi = i - 4 * a;
+            let ni = i + 4 * a;
+            if (data[pi]) {
+                let p = {
+                    r: data[pi],
+                    g: data[pi + 1],
+                    b: data[pi + 2],
+                    a: data[pi + 3]
+                };
+                arr.push(p);
+            }
+            if (data[ni]) {
+                let n = {
+                    r: data[ni],
+                    g: data[ni + 1],
+                    b: data[ni + 2],
+                    a: data[ni + 3]
+                };
+                arr.push(n);
+            }
+        }
+        let tr = 0;
+        let tg = 0;
+        let tb = 0;
+        let ta = 0;
+        let len = arr.length;
+        arr.map(v => {
+            tr += v.r;
+            tg += v.g;
+            tb += v.b;
+            ta += v.a;
+        });
+        points = {
+            r: tr / len,
+            g: tg / len,
+            b: tb / len,
+            a: ta / len
+        };
+        return points;
+    }
 
-			console.log(imgdata)
-
-			ctx.clearRect(0,0,w,h);
-
-			ctx.putImageData(imgdata, 520, 0);
-	</script>
+    photo.src = img;
+</script>
 </body>
 </html>
