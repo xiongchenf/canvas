@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    function BBColor(posX , posY) {
+        var centerItemIndex = posY * picWidth4 + posX * 3 , neighbourItemIndex;
+        var weightIndex;
+        var gsAccumWeight = 0;
+        var accumColor = 0;
+
+        // 计算各个采样点处的Gaussian权重，包括closeness，similarity
+        for(var i = -number ; i <= number ; ++i)
+        {
+            for(var j = -number ; j <= number ; ++j)
+            {
+                weightIndex = (i + number) * (number * 2 + 1) + (j + number);
+                neighbourItemIndex = min(noiseImageHeight - 1 , max(0 , posY + j * radius)) * picWidth4 +
+                    min(noiseImageWidth - 1  , max(0 , posX + i * radius)) * 3;
+
+                pCSWeight[weightIndex] = LookupGSWeightTable(pSrcDataBuffer[neighbourItemIndex] , pSrcDataBuffer[centerItemIndex]);
+                pCSWeight[weightIndex] = pGSWeight[weightIndex] * pGCWeight[weightIndex];
+                gsAccumWeight += pCSWeight[weightIndex];
+            }
+        }
+
+        // 单位化权重因子
+        gsAccumWeight = 1 / gsAccumWeight;
+        for(var i = -number ; i <= number ; ++i)
+        {
+            for(var j = -number ; j <= number ; ++j)
+            {
+                weightIndex = (i + number) * (number * 2 + 1) + (j + number);
+                pCSWeight[weightIndex] *= gsAccumWeight;
+            }
+        }
+
+        // 计算最终的颜色并返回
+        for(var i = -number ; i <= number ; ++i)
+        {
+            for(var j = -number ; j <= number ; ++j)
+            {
+                weightIndex = (i + number) * (number * 2 + 1) + (j + number);
+                neighbourItemIndex = min(noiseImageHeight - 1 , max(0 , posY + j * radius)) * picWidth4 +
+                    min(noiseImageWidth - 1  , max(0 , posX + i * radius)) * 3;
+                accumColor += pSrcDataBuffer[neighbourItemIndex + 0] * pCSWeight[weightIndex];
+            }
+        }
+
+        return UCHAR3(accumColor , accumColor , accumColor);
+    }
+
+</script>
+</body>
+</html>
